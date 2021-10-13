@@ -1,15 +1,28 @@
-def to_tokens(s):
-    for i in '+-*/()=':
-        s = s.replace(i, ' % s ' % i)
-    return s.split()
-
-
 PREC = {
     '-': 1,
     '+': 1,
     '*': 2,
     '/': 2
 }
+
+
+def to_tokens(expression):
+    for i in '+-*/()=':
+        expression = expression.replace(i, ' % s ' % i)
+    expression = expression.split()
+    count = 0
+    signs = '+-*/(='
+    while count < len(expression) - 1:
+        if expression[0] == '-':
+            expression.pop(0)
+            expression[0] = '-' + expression[0]
+            continue
+        if expression[count] == '-' and expression[count-1] in signs:
+            expression.pop(count)
+            expression[count] = '-' + expression[count]
+            continue
+        count += 1
+    return expression
 
 
 def ishigher(x, y):
@@ -19,11 +32,6 @@ def ishigher(x, y):
 def to_rpn(tokens):
     stack = []
     result = []
-
-    if tokens[0] == '-':
-        del tokens[0]
-        tokens[0] = '-' + tokens[0]
-
     for i in tokens:
         if i in PREC:
             while stack and ishigher(stack[-1], i):
